@@ -33,6 +33,8 @@ public class TileFluxAccessorFlux extends AENetworkedBlockEntity implements IFlu
 
     private final FluxAccessorTransferHandler transferHandler = new FluxAccessorTransferHandler();
     private ProxyFluxDevice fluxProxyDevice;
+    private CompoundTag pendingFluxTag;
+    private byte pendingFluxTagType;
 
     public TileFluxAccessorFlux(BlockPos pos, BlockState state) {
         super(Objects.requireNonNull(MoreFluxStorageContent.getFluxAccessorFluxBlockEntityType(), "Flux accessor block entity type is not registered"), pos, state);
@@ -54,6 +56,11 @@ public class TileFluxAccessorFlux extends AENetworkedBlockEntity implements IFlu
     @Override
     public void onReady() {
         getOrCreateFluxProxyDevice().syncLevel();
+        // Process any pending flux tag data that was received before level was initialized
+        if (pendingFluxTag != null) {
+            getOrCreateFluxProxyDevice().readCustomTag(pendingFluxTag, pendingFluxTagType);
+            pendingFluxTag = null;
+        }
         super.onReady();
     }
 
@@ -137,7 +144,13 @@ public class TileFluxAccessorFlux extends AENetworkedBlockEntity implements IFlu
 
     @Override
     public void readFluxTag(CompoundTag tag, byte type) {
-        getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+        // Defer reading if level is not yet initialized to avoid NPE in FluxNetworks
+        if (level == null) {
+            pendingFluxTag = tag.copy();
+            pendingFluxTagType = type;
+        } else {
+            getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+        }
     }
 
     @Override
