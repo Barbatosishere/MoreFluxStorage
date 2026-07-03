@@ -195,6 +195,10 @@ public class TileFluxAccessorFlux extends AENetworkedBlockEntity implements IFlu
     private final class FluxAccessorTransferHandler extends AbstractFluxTransferHandler {
 
         private void syncBufferFromStorage() {
+            // Only sync on server side to avoid client crashes
+            if (level == null || level.isClientSide) {
+                return;
+            }
             IStorageService storage = getStorageService();
             setBuffer(storage == null ? 0L : storage.getCachedInventory().get(FluxKey.of(EnergyType.FE)));
         }
