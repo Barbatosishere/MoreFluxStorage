@@ -146,12 +146,15 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
 
     @Override
     public void readFluxTag(CompoundTag tag, byte type) {
-        // Defer reading if level is not yet initialized to avoid NPE in FluxNetworks
-        if (level == null) {
+        // FIX: Sync level on the proxy device before reading, as ProxyFluxDevice has its own
+        // level field that must be explicitly synced from the host BlockEntity
+        ProxyFluxDevice device = getOrCreateFluxProxyDevice();
+        device.syncLevel();
+        if (device.getLevel() == null) {
             pendingFluxTag = tag.copy();
             pendingFluxTagType = type;
         } else {
-            getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+            device.readCustomTag(tag, type);
         }
     }
 
