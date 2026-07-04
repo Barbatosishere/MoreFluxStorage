@@ -23,9 +23,9 @@ public final class ProxyFluxDevice extends TileFluxStorage implements IFluxStora
     }
 
     public void markChunkUnsaved() {
-        assert this.host.getTE().getLevel() != null;
-
-        this.host.getTE().getLevel().getChunkAt(this.worldPosition).setUnsaved(true);
+        if (this.host.getTE().getLevel() != null) {
+            this.host.getTE().getLevel().getChunkAt(this.worldPosition).setUnsaved(true);
+        }
     }
 
     public void setLevel() {

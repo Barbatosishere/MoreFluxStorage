@@ -35,6 +35,8 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
 
     private final InductionPortTransferHandler transferHandler = new InductionPortTransferHandler();
     private ProxyFluxDevice fluxProxyDevice;
+    private CompoundTag pendingFluxTag;
+    private byte pendingFluxTagType;
 
     public TileInductionPortFlux(BlockPos pos, BlockState state) {
         super(Utils.trigger(pos), state);
@@ -80,6 +82,11 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
     @Override
     public void onLoad() {
         getOrCreateFluxProxyDevice().setLevel();
+        // Process any pending flux tag data that was received before level was initialized
+        if (pendingFluxTag != null) {
+            getOrCreateFluxProxyDevice().readCustomTag(pendingFluxTag, pendingFluxTagType);
+            pendingFluxTag = null;
+        }
         super.onLoad();
     }
 
@@ -151,7 +158,14 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
 
     @Override
     public void readFluxTag(CompoundTag tag, byte type) {
-        getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+        ProxyFluxDevice device = getOrCreateFluxProxyDevice();
+        device.setLevel();
+        if (device.getLevel() == null) {
+            pendingFluxTag = tag.copy();
+            pendingFluxTagType = type;
+        } else {
+            device.readCustomTag(tag, type);
+        }
     }
 
     public InteractionResult onSneakRightClick(Player player) {
