@@ -105,6 +105,7 @@ public class TileFluxAccessorFlux extends AENetworkBlockEntity implements IFluxP
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
+        getOrCreateFluxProxyDevice().setLevel();
         getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
     }
 

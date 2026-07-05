@@ -86,6 +86,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
     @Override
     public void readExtraNBT(CompoundTag tag) {
         super.readExtraNBT(tag);
+        getOrCreateFluxProxyDevice().setLevel();
         getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
     }
 
@@ -106,6 +107,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
+        getOrCreateFluxProxyDevice().setLevel();
         getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
     }
 

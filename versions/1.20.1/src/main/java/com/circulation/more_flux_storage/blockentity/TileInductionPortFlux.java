@@ -119,6 +119,7 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
+        getOrCreateFluxProxyDevice().setLevel();
         getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
     }
 
